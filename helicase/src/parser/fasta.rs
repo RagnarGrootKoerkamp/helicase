@@ -624,4 +624,14 @@ mod tests {
             vec!["TTTCTTAAAAAAGAAAAACAA", "CTCTTAAAACAAAAGCTTT", "CCAC",]
         );
     }
+
+    #[test]
+    fn test_dna_len() {
+        let mut parser = FastaParser::<
+            { COMPUTE_DNA_LEN | SPLIT_NON_ACTG | MERGE_DNA_CHUNKS | MERGE_RECORDS },
+            _,
+        >::from_slice(FASTA);
+        parser.next();
+        assert_eq!(parser.get_dna_len(), 44);
+    }
 }
