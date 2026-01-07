@@ -9,10 +9,18 @@ needletail = { version = "0.6", default-features = false, features = [
     "zstd",
 ] }
 paraseq = { version = "0.4", default-features = false, features = ["niffler"] }
-rayon = "1"
 regex = "1.11"
 helicase = { path = "../helicase" }
 colored = "3.0.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 perf-event = "0.4.8"
+
+[features]
+default = ["all_baselines", "slices_only"]
+all_baselines = ["regex", "needletail", "paraseq"]
+regex = []
+needletail = []
+paraseq = []
+slices_only = []
+header_only = []

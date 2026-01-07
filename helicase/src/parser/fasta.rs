@@ -393,6 +393,10 @@ impl<'a, const CONFIG: Config, I: InputData<'a>> Iterator for FastaParser<'a, CO
                     }
                 }
                 State::Restart => {
+                    if dna_is_ignored(CONFIG) {
+                        self.finished = self.skip_to_start_header();
+                    }
+
                     if self.finished {
                         self.state = State::Start;
                         if flag_is_set(CONFIG, RETURN_RECORD) {

@@ -50,6 +50,8 @@ fn bench_config<const CONFIG: Config, P: AsRef<Path>, M: Measurement>(label: &st
     }
 
     if !s.compressed {
+        #[cfg(not(feature="slices_only"))]
+        {
         m.start();
         for _ in 0..s.rep {
             let parser = FastxParser::<CONFIG>::from_file_mmap(&s.path).unwrap();
@@ -59,6 +61,7 @@ fn bench_config<const CONFIG: Config, P: AsRef<Path>, M: Measurement>(label: &st
         }
         let lab = format!("{label} (mmap)");
         m.show(&lab, s.size, s.rep);
+        }
         m.start();
         for _ in 0..s.rep {
             let parser = FastxParser::<CONFIG>::from_slice(s.data);
@@ -69,6 +72,9 @@ fn bench_config<const CONFIG: Config, P: AsRef<Path>, M: Measurement>(label: &st
         let lab = format!("{label} (slice)");
         m.show(&lab, s.size, s.rep);
     } else {
+
+        #[cfg(not(feature="slices_only"))]
+        {
         m.start();
         for _ in 0..s.rep {
             let parser = FastxParser::<CONFIG>::from_reader(s.data);
@@ -78,11 +84,14 @@ fn bench_config<const CONFIG: Config, P: AsRef<Path>, M: Measurement>(label: &st
         }
         let lab = format!("{label} (reader)");
         m.show(&lab, s.size, s.rep);
+        }
     }
 }
 
 fn measurment_variant<M: Measurement, P: AsRef<Path>>(s: Setup<P>) {
     let mut m = M::new();
+
+    #[cfg(feature = "regex")]
     if !s.compressed {
         let match_dna = RegexBuilder::new(r"(>[^\n]*\n)").build().unwrap();
         m.start();
@@ -94,6 +103,8 @@ fn measurment_variant<M: Measurement, P: AsRef<Path>>(s: Setup<P>) {
         m.show("Regex header (slice)", s.size, s.rep);
     }
 
+    #[cfg(feature ="needletail")]
+    {
     m.start();
     for _ in 0..s.rep {
         let mut reader = parse_fastx_file(&s.path).expect("invalid file");
@@ -124,10 +135,10 @@ fn measurment_variant<M: Measurement, P: AsRef<Path>>(s: Setup<P>) {
             base += record.num_bases();
         }
         black_box(base);
-        println!("Needletaile len: {base}");
     }
     m.show("Needletail (dna len)", s.size, s.rep);
-
+    }
+    #[cfg(feature ="paraseq")]
     if !s.compressed {
         m.start();
         for _ in 0..s.rep {
@@ -161,8 +172,10 @@ fn measurment_variant<M: Measurement, P: AsRef<Path>>(s: Setup<P>) {
     }
 
     println!("---");
-
     bench_config::<HEADER_ONLY, _, M>("Header only", &s);
+
+    #[cfg(not(feature ="header_only"))]
+    {
     bench_config::<DNA_STRING, _, M>("DNA string", &s);
     bench_config::<DNA_PACKED, _, M>("DNA packed", &s);
     bench_config::<DNA_COLUMNAR, _, M>("DNA columnar", &s);
@@ -177,9 +190,9 @@ fn measurment_variant<M: Measurement, P: AsRef<Path>>(s: Setup<P>) {
             parser.next();
             //black_box(parser.get_dna_len());
 
-            println!("helicase dna len: {}", parser.get_dna_len());
         }
         m.show("DNA len (slice)", s.size, s.rep);
+    }
     }
 }
 

@@ -18,6 +18,17 @@ pub mod advanced {
         config & flag == 0
     }
 
+    #[inline(always)]
+    pub const fn dna_is_ignored(config: Config) -> bool {
+            config 
+                & (COMPUTE_DNA_STRING
+                    | COMPUTE_DNA_COLUMNAR
+                    | COMPUTE_DNA_PACKED
+                    | SPLIT_NON_ACTG
+                    | RETURN_DNA_CHUNK) 
+                == 0
+                
+    }
     pub const DEFAULT_CONFIG: Config = COMPUTE_HEADER | COMPUTE_DNA_STRING | RETURN_RECORD;
 
     pub const COMPUTE_HEADER: Config = 1 << 0;
