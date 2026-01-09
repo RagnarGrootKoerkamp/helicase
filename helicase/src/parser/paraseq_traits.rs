@@ -5,7 +5,7 @@ use crate::input::*;
 use paraseq::Record;
 use std::borrow::Cow;
 
-impl<'a, const CONFIG: Config, I: InputData<'a>> Record for FastaParser<'a, CONFIG, I> {
+impl<'a, const CONFIG: Config, I: InputData<'a>> Record for &'a FastaParser<'a, CONFIG, I> {
     #[inline(always)]
     fn id(&self) -> &[u8] {
         self.get_header()
@@ -24,7 +24,7 @@ impl<'a, const CONFIG: Config, I: InputData<'a>> Record for FastaParser<'a, CONF
     }
 }
 
-impl<'a, const CONFIG: Config, I: InputData<'a>> Record for FastqParser<'a, CONFIG, I> {
+impl<'a, const CONFIG: Config, I: InputData<'a>> Record for &'a FastqParser<'a, CONFIG, I> {
     #[inline(always)]
     fn id(&self) -> &[u8] {
         self.get_header()
@@ -43,7 +43,7 @@ impl<'a, const CONFIG: Config, I: InputData<'a>> Record for FastqParser<'a, CONF
     }
 }
 
-impl<'a, const CONFIG: Config> Record for FastxParser<'a, CONFIG> {
+impl<'a, const CONFIG: Config> Record for &'a FastxParser<'a, CONFIG> {
     #[inline(always)]
     fn id(&self) -> &[u8] {
         self.get_header()
