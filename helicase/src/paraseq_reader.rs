@@ -88,6 +88,10 @@ impl<'b, const CONFIG: Config> paraseq::parallel::ParallelReader
                 };
             }
 
+            // We could try to split in same record, then multiple
+            // splits will be data.len(), dedup to remove those
+            splits.dedup();
+
             // Could end up with less threads than splits
             let actual_threads = splits.len() - 1;
 
