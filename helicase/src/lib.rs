@@ -3,6 +3,8 @@ pub mod config;
 pub mod dna_format;
 pub mod input;
 pub mod lexer;
+#[cfg(feature = "paraseq")]
+pub mod paraseq_reader;
 pub mod parser;
 
 pub use config::{Config, ParserOptions};
